@@ -1,8 +1,10 @@
 import { Random } from 'random-seed-class';
 import { Grid } from 'prime-intersection-grid';
+import { Society } from './society.js';
+import sift from "sift";
 
 const generateSyllables = (count, random, consonants='bcdfghjklmnpqrstvwxyz'.split(''), vowels='aeiouy'.split(''))=>{
-    lcv=0;
+    let lcv=0;
     const results = [];
     let ratio = null;
     for(;lcv<count; lcv++){
@@ -21,7 +23,7 @@ const generateSyllables = (count, random, consonants='bcdfghjklmnpqrstvwxyz'.spl
 }
 
 export class World{
-    static let prefix = '';
+    static prefix = '';
     constructor(options){
         this.name = World.prefix + (options.seed || 'default-world');
         this.random = new Random(this.name);
@@ -29,7 +31,7 @@ export class World{
         if(!this.max.societies) this.max.societies = 10;
         if(!this.max.groupsPerSociety) this.max.groupsPerSociety = 10;
         if(!this.max.societies) this.max.societies = 10;
-        this.syllables = generateSyllables(150);
+        this.syllables = generateSyllables(150, this.random);
         this.societies = [];
         let lcv=0;
         for(;lcv < this.max.societies; lcv++){
@@ -43,9 +45,9 @@ export class World{
             origins: [
                 [0, 0, 0],
                 [
-                    random.integer(2000)-1000, 
-                    random.integer(2000)-1000, 
-                    random.integer(2000)-1000
+                    this.random.integer(2000)-1000, 
+                    this.random.integer(2000)-1000, 
+                    this.random.integer(2000)-1000
                 ]
             ]
         });
@@ -56,7 +58,18 @@ export class World{
         //this function uses it's own seed to prevent state pollution
         const random = new Random(`${this.name}-${x}-${y}`);
         const positionalProperties = this.grid.cell(x, y);
-        const biomes = this.biomes.filter(sift(positionalProperties))
+        //console.log(positionalProperties);
+        const biomes = this.biomes.filter((biome)=>{
+            const result =  sift(biome.context)(positionalProperties);
+            //console.log(biome, result);
+            return result;
+        });
+        const selectedBiome = random.array(biomes);
+        if(!selectedBiome) throw new Error('no biome available for state');
+        return {
+            properties: positionalProperties,
+            biome: selectedBiome.biome
+        }
     }
     
     addBiome(context, biome){

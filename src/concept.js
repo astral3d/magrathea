@@ -1,14 +1,14 @@
 import sift from "sift";
 
 export class Concept{
-    static let defaults = {
+    static defaults = {
         _ : ['density', 'utility', 'ownership', 'transactions', 'society', 'condition'],
         density : [
             { name:"unspoiled", enables: ["utility:unused", "utility:public"] },
             { name:"uninhabited", enables: ["utility:unused", "utility:public", "utility:abandoned", "utility:planning"] },
             { name:"ranged", enables: ["utility:unused", "utility:public", "utility:abandoned", "utility:planning", "utility:public"] },
             { name:"subsistance", enables: ["utility:unused", "utility:public", "utility:abandoned", "utility:planning", "utility:public", "utility:residential"] },
-            { name:"rural", enables: ["utility:*"], disables:["utility:planning", "utility:industrial"] }
+            { name:"rural", enables: ["utility:*"], disables:["utility:planning", "utility:industrial"] },
             { name:"town", enables: ["utility:*"], disables:["utility:planning"] },
             { name:"suburban", enables: ["utility:*"] },
             { name:"city", enables: ["utility:*"] },
@@ -76,7 +76,7 @@ export class Concept{
         contexts._.forEach((contextName, index)=>{
             const context = available[contextName] || [];
             const subselect = subselects[index];
-            const selectable = subselect?context.filter(sift(subselect):context;
+            const selectable = subselect?context.filter(sift(subselect)):context;
             const selected = this.random.array(context);
             if(selected.enables) selected.enables.forEach((enable)=>{
                 const parts = enable.split(':');

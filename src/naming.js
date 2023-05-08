@@ -48,11 +48,11 @@ export class Nomenclature{
     }
     
     createBusinessName(owner){
-        
+        return this.createSurname();
     }
     
     createTitle(owner){
-        
+        return this.createSurname();
     }
     
     
