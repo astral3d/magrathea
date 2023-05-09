@@ -3,7 +3,12 @@ import { Grid } from 'prime-intersection-grid';
 import { Society } from './society.js';
 import sift from "sift";
 
-const generateSyllables = (count, random, consonants='bcdfghjklmnpqrstvwxyz'.split(''), vowels='aeiouy'.split(''))=>{
+const generateSyllables = (
+    count, 
+    random, 
+    consonants='bcdfghjklmnpqrstvwxyz'.split(''), 
+    vowels='aeiouy'.split('')
+)=>{
     let lcv=0;
     const results = [];
     let ratio = null;
@@ -34,10 +39,12 @@ export class World{
         this.syllables = generateSyllables(150, this.random);
         this.societies = [];
         let lcv=0;
+        let seed = null;
         for(;lcv < this.max.societies; lcv++){
+            seed = this.random.string('abcdefghijklmnopqrstuvwxyz'.split(''), 10);
             this.societies.push(new Society({
                 syllables : this.syllables,
-                random: this.random
+                seed
             }))
         }
         this.grid = new Grid({
@@ -66,7 +73,18 @@ export class World{
         });
         const selectedBiome = random.array(biomes);
         if(!selectedBiome) throw new Error('no biome available for state');
+        const sortedByDistance = this.societies.slice().sort((a, b)=>{
+            const aDistance = Math.sqrt( (x - a.origin.x)^2 + (y - a.origin.y)^2 );
+            const bDistance = Math.sqrt( (x - b.origin.x)^2 + (y - b.origin.y)^2 );
+            if(aDistance === bDistance) return 0;
+            if(aDistance < bDistance) return -1;
+            return 1;
+        });
+        const society = sortedByDistance[0];
+        const influences = sortedByDistance.slice(1, this.random.integer(2));
         return {
+            society,
+            influences,
             properties: positionalProperties,
             biome: selectedBiome.biome
         }

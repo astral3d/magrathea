@@ -12,6 +12,7 @@ export class Nomenclature{
     constructor(name, chunks){
         this.name = name;
         this.chunks = chunks;
+        if(!chunks.length) throw new Error('no langauge parts provided!');
         this.random = new Random(name);
         const partitionSize = Math.floor(chunks.length/3);
         this.formal = chunks.slice(0, partitionSize);
@@ -40,11 +41,23 @@ export class Nomenclature{
     }
     
     createFirstName(surname){
-        return this.random.array(this.firstName);
+        const syllableCount = 1+this.random.integer(5);
+        const name =  (
+            new Array(syllableCount)
+        ).fill('').map(()=>{
+            return this.random.array(this.firstName);
+        }).join('');
+        return name;
     }
     
     createSurname(){
-        return this.random.array(this.surname);
+        const syllableCount = 1+this.random.integer(5);
+        const name =  (
+            new Array(syllableCount)
+        ).fill('').map(()=>{
+            return this.random.array(this.surname);
+        }).join('');
+        return name;
     }
     
     createBusinessName(owner){
