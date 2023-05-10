@@ -5,4 +5,12 @@ import { Concept } from './src/concept.js';
 import { Biome } from './src/biome.js';
 import { Context } from './src/context.js';
 import { Nomenclature } from './src/naming.js';
-export { World, Society, Group, Concept, Biome, Context, Nomenclature };
+export { 
+    World, 
+    Society, 
+    Group, 
+    Concept, 
+    Biome, 
+    Context, 
+    Nomenclature
+};
