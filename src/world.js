@@ -65,10 +65,8 @@ export class World{
         //this function uses it's own seed to prevent state pollution
         const random = new Random(`${this.name}-${x}-${y}`);
         const positionalProperties = this.grid.cell(x, y);
-        //console.log(positionalProperties);
         const biomes = this.biomes.filter((biome)=>{
             const result =  sift(biome.context)(positionalProperties);
-            //console.log(biome, result);
             return result;
         });
         const selectedBiome = random.array(biomes);
