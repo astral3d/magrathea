@@ -16,7 +16,7 @@ export class Society{
         if(ageRatio > 0.75) age += this.random.ratio() * 10000;
         if(ageRatio > 0.90) age += this.random.ratio() * 20000;
         this.age = age;
-        this.socialContext = new Concept({ random: this.random });
+        this.socialContext = new Concept({ seed });
         this.socialState = this.socialContext.get(['society', 'transactions', 'condition'], {age: this.age});
         const xMin = options.bounds?.x?.min || -10000;
         const xMax = options.bounds?.x?.max || 10000;

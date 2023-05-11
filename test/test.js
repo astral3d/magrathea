@@ -28,10 +28,10 @@ describe('magrathea', ()=>{
                })
             );
             //const world = builder.build();
-            const composite = builder.at(5000, 5000);
+            //const composite = builder.at(5000, 5000);
             const prime = builder.at(13, 7);
-            //console.log(composite, prime)
-            console.log(composite.society.socialState, prime.society.socialState)
+            console.log(prime)
+            //console.log(composite.society.socialState,  prime.society.socialState)
         });
     });
 });

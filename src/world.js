@@ -82,11 +82,13 @@ export class World{
         });
         const society = sortedByDistance[0];
         const influences = sortedByDistance.slice(1, this.random.integer(2));
+        const tileProperties = society.socialContext.get(['density', 'utility'], society.socialState)
         return {
             society,
             influences,
-            properties: positionalProperties,
-            biome: selectedBiome.biome
+            positional: positionalProperties,
+            biome: selectedBiome.biome,
+            properties: tileProperties
         }
     }
     

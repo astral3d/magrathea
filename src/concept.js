@@ -1,4 +1,5 @@
 import sift from "sift";
+import { Random } from 'random-seed-class';
 
 export class Concept{
     static defaults = {
@@ -49,11 +50,11 @@ export class Concept{
             { name:"tribal", enables:["density:*", "transactions:*", "condition:*"], disables:["density:rural", "density:town", "density:city", "density:metropolis", "transactions:currency"], weight: 10},
             { name:"agricultural", enables:["density:*", "transactions:*", "condition:*"], disables:["density:city", "density:metropolis", "ownership:shareholders"], weight: 10, requires : { age: {$gt: 10000} }},
             { name:"industrial", enables:["density:*", "transactions:*"], disables:["density:metropolis"], weight: 10, requires : { age: {$gt: 15000} }},
-            { name:"solar", enables:["density:*"], weight: 10, requires : { age: {$gt: 4000} }},
-            { name:"interstellar", enables:["density:*", "transactions:*", "condition:*"], weight: 10, requires : { age: {$gt: 5000} }},
-            { name:"post-scarcity", enables:["density:*", "transactions:*", "condition:*"], weight: 10, requires : { age: {$gt: 10000} }},
-            { name:"actualizing", enables:["density:*", "transactions:*", "condition:*"], weight: 10, requires : { age: {$gt: 6000} }},
-            { name:"corporeal", enables:["density:*", "transactions:*", "condition:*"], weight: 10, requires : { age: {$gt: 7000} }},
+            { name:"solar", enables:["density:*"], weight: 10, requires : { age: {$gt: 16000} }},
+            { name:"interstellar", enables:["density:*", "transactions:*", "condition:*"], weight: 10, requires : { age: {$gt: 20000} }},
+            { name:"post-scarcity", enables:["density:*", "transactions:*", "condition:*"], weight: 10, requires : { age: {$gt: 30000} }},
+            { name:"actualizing", enables:["density:*", "transactions:*", "condition:*"], weight: 10, requires : { age: {$gt: 40000} }},
+            { name:"noncorporeal", enables:["density:*", "transactions:*", "condition:*"], weight: 10, requires : { age: {$gt: 50000} }},
         ],
         condition : [
             { name:"fledgling", weight: 10},
@@ -66,27 +67,68 @@ export class Concept{
     };
     
     constructor(options={}){
-        this.random = options.random || new Random(options.seed || 'default');
+        this.seed = options.seed || 'default';
+        if(!Concept.defaults.density.length) throw new Error('No density')
     }
     
     get(incomingSeries, incomingValues={}, contexts=Concept.defaults, subselects=[]){
+        const random = new Random(this.seed);
         const series = incomingSeries || Concept.defaults._;
         const available = {};
         const results = JSON.parse(JSON.stringify(incomingValues));
         available[series[0]] = contexts[series[0]];
+        console.log('>', series, results);
+        const enable = (text)=>{
+            const parts = text.split(':');
+            if(parts[1] === '*'){
+                available[parts[0]] = contexts[parts[0]];
+            }else{
+                if(parts[1]){
+                    if(!available[parts[0]]) available[parts[0]] = [];
+                    //todo: check value
+                    const foundIndex = contexts[parts[0]].findIndex((item)=> item.name === parts[1]);
+                    available[parts[0]].push(contexts[parts[0]][foundIndex]);
+                }
+            }
+        }
+        const disable = (text)=>{
+            const parts = text.split(':');
+            if(parts[1]){
+                //todo: check value
+                const foundIndex = contexts[parts[0]].findIndex((item)=> item.name === parts[1]);
+                if(foundIndex) contexts[parts[0]].splice(foundIndex, 1);
+            }
+        }
+        let found = null;
+        Object.keys(results).forEach((key)=>{
+            found = null;
+            if(results[key] && contexts[key]){
+                found = contexts[key].find((item)=>item.name === results[key]);
+                if(found && found.enables) found.enables.forEach((text)=>enable(text));
+                if(found && found.disables) found.disables.forEach((text)=>disable(text));
+                
+                console.log('F', available);
+            }
+        });
         series.forEach((contextName, index)=>{
             const context = available[contextName] || [];
             const subselect = subselects[index];
             let selectable = subselect?context.filter(sift(subselect)):context;
+            console.log('BEFORE', contextName, selectable, available);
             selectable = selectable.filter((item)=>{
-                if(item.requires) return !sift(item.requires)(results);
-                else false;
+                //console.log('==>', item.requires, results, item);
+                if(item.requires) return sift(item.requires)(results);
+                else return true;
             });
-            console.log(contextName, selectable);
-            const selected = this.random.array(context);
+            console.log('AFTER', contextName, selectable);
+            const selected = random.array(selectable);
+            if(!selected){
+                return; //don't do anything
+            }
             results[contextName] = selected.name;
-            if(selected.enables) selected.enables.forEach((enable)=>{
-                const parts = enable.split(':');
+            if(selected.enables) selected.enables.forEach((text)=>{
+                enable(text);
+                /*const parts = enable.split(':');
                 if(parts[1] === '*'){
                     available[parts[0]] = contexts[parts[0]];
                 }else{
@@ -96,15 +138,16 @@ export class Concept{
                         const foundIndex = contexts[parts[0]].findIndex((item)=> item.name === parts[1]);
                         available[parts[0]].push(contexts[parts[0]][foundIndex]);
                     }
-                }
+                }*/
             });
-            if(selected.disables) selected.disables.forEach((disable)=>{
-                const parts = disable.split(':');
+            if(selected.disables) selected.disables.forEach((text)=>{
+                disable(text);
+                /*const parts = disable.split(':');
                 if(parts[1]){
                     //todo: check value
                     const foundIndex = contexts[parts[0]].findIndex((item)=> item.name === parts[1]);
                     if(foundIndex) contexts[parts[0]].splice(foundIndex, 1);
-                }
+                }*/
             });
         });
         return results;
