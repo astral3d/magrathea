@@ -17,8 +17,8 @@ export class Concept{
         this.seed = options.seed || 'default';
     }
     
-    get(incomingSeries, incomingValues={}, contexts=Concept.defaults, subselects=[]){
-        const random = new Random(this.seed);
+    get(incomingSeries, incomingValues={}, seed=this.seed, contexts=Concept.defaults, subselects=[]){
+        const random = new Random({seed});
         const series = incomingSeries || Concept.defaults._;
         const available = {};
         const results = JSON.parse(JSON.stringify(incomingValues));

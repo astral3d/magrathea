@@ -63,7 +63,8 @@ export class World{
     
     at(x, y){
         //this function uses it's own seed to prevent state pollution
-        const random = new Random(`${this.name}-${x}-${y}`);
+        const seed = `${this.name}-${x}-${y}`;
+        const random = new Random(seed);
         const positionalProperties = this.grid.cell(x, y);
         const biomes = this.biomes.filter((biome)=>{
             const result =  sift(biome.context)(positionalProperties);
@@ -79,8 +80,8 @@ export class World{
             return 1;
         });
         const society = sortedByDistance[0];
-        const influences = sortedByDistance.slice(1, this.random.integer(2));
-        const tileProperties = society.socialContext.get(['density', 'utility'], society.socialState)
+        const influences = sortedByDistance.slice(1, random.integer(4));
+        const tileProperties = society.socialContext.get(['density', 'utility'], society.socialState, seed)
         return {
             society,
             influences,
