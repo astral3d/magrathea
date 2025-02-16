@@ -1,6 +1,7 @@
 import { Random } from 'random-seed-class';
-import { Nomenclature } from './naming.js';
-import { Concept } from './concept.js';
+import { Nomenclature } from './naming.mjs';
+import { Concept } from './concept.mjs';
+import { Context } from './context.mjs';
 export class Society{
     constructor(options={}){
         const seed = options.seed||'default';
@@ -16,8 +17,14 @@ export class Society{
         if(ageRatio > 0.75) age += this.random.ratio() * 10000;
         if(ageRatio > 0.90) age += this.random.ratio() * 20000;
         this.age = age;
+        //this.worldContext = new Context();
         this.socialContext = new Concept({ seed });
-        this.socialState = this.socialContext.get(['society', 'transactions', 'condition'], {age: this.age});
+        this.socialState = this.socialContext.get(
+            ['society', 'transactions', 'condition'], 
+            {age: this.age}, 
+            seed, 
+            options.context
+        );
         const xMin = options.bounds?.x?.min || -10000;
         const xMax = options.bounds?.x?.max || 10000;
         const yMin = options.bounds?.y?.min || -10000;

@@ -1,6 +1,7 @@
 import { Random } from 'random-seed-class';
 import { Grid } from 'prime-intersection-grid';
-import { Society } from './society.js';
+import { Society } from './society.mjs';
+import { Context } from './context.mjs';
 import sift from "sift";
 
 const generateSyllables = (
@@ -39,12 +40,18 @@ export class World{
         this.syllables = generateSyllables(150, this.random);
         this.societies = [];
         let lcv=0;
+        let context = null;
+        if(options.context){
+            this.context = new Context(options.context);
+            context = this.context;
+        }
         let seed = null;
         for(;lcv < this.max.societies; lcv++){
             seed = this.random.string('abcdefghijklmnopqrstuvwxyz'.split(''), 10);
             this.societies.push(new Society({
                 syllables : this.syllables,
-                seed
+                seed,
+                context
             }))
         }
         this.grid = new Grid({
@@ -81,7 +88,12 @@ export class World{
         });
         const society = sortedByDistance[0];
         const influences = sortedByDistance.slice(1, random.integer(4));
-        const tileProperties = society.socialContext.get(['density', 'utility'], society.socialState, seed)
+        const tileProperties = society.socialContext.get(
+            ['density', 'utility'], 
+            society.socialState, 
+            seed,
+            this.context
+        );
         return {
             society,
             influences,

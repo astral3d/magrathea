@@ -1,6 +1,6 @@
 import sift from "sift";
 import { Random } from 'random-seed-class';
-import { Context } from './context.js';
+import { Context } from './context.mjs';
 
 const defineContext = (ob, name, value)=>{
     const frozen = typeof value === 'object'?Object.freeze(value):value;
