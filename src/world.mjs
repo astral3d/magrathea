@@ -1,4 +1,4 @@
-import { Random } from 'random-seed-class';
+import { Random } from '@environment-safe/random';
 import { Grid } from 'prime-intersection-grid';
 import { Society } from './society.mjs';
 import { Context } from './context.mjs';
@@ -32,7 +32,8 @@ export class World{
     static prefix = '';
     constructor(options){
         this.name = World.prefix + (options.seed || 'default-world');
-        this.random = new Random(this.name);
+        console.log('world seed', this.name)
+        this.random = new Random({seed: this.name});
         this.max = options.max || {};
         if(!this.max.societies) this.max.societies = 10;
         if(!this.max.groupsPerSociety) this.max.groupsPerSociety = 10;
@@ -47,7 +48,7 @@ export class World{
         }
         let seed = null;
         for(;lcv < this.max.societies; lcv++){
-            seed = this.random.string('abcdefghijklmnopqrstuvwxyz'.split(''), 10);
+            seed = this.random.string('abcdefghijklmnopqrstuvwxyz'.split(''), 10, 10);
             this.societies.push(new Society({
                 syllables : this.syllables,
                 seed,
@@ -71,7 +72,9 @@ export class World{
     at(x, y){
         //this function uses it's own seed to prevent state pollution
         const seed = `${this.name}-${x}-${y}`;
-        const random = new Random(seed);
+        console.log('instance seed', seed);
+        const random = new Random({ seed });
+        console.log('random', random.integer(0,20));
         const positionalProperties = this.grid.cell(x, y);
         const biomes = this.biomes.filter((biome)=>{
             const result =  sift(biome.context)(positionalProperties);
@@ -94,13 +97,20 @@ export class World{
             seed,
             this.context
         );
-        return {
+        const result = {
             society,
             influences,
+            random,
             positional: positionalProperties,
             biome: selectedBiome.biome,
-            properties: tileProperties
+            properties: tileProperties,
+            markers : ()=> selectedBiome.biome.markers(x, y, this, result),
+            npcs : ()=>selectedBiome.biome.npcs(x, y, this, result),
+            voxels : ()=> selectedBiome.biome.voxels(x, y, this, result),
+            scenery : ()=> selectedBiome.biome.scenery(x, y, this, result)
         }
+        result.markers();
+        return result;
     }
     
     addBiome(context, biome){

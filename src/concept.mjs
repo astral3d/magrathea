@@ -1,5 +1,5 @@
 import sift from "sift";
-import { Random } from 'random-seed-class';
+import { Random } from '@environment-safe/random';
 import { Context } from './context.mjs';
 
 const defineContext = (ob, name, value)=>{

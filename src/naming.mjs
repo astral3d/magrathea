@@ -1,4 +1,4 @@
-import { Random } from 'random-seed-class';
+import { Random } from '@environment-safe/random';
 const makeWord = (count, syllables, random)=>{
     let lcv =0;
     let result = '';

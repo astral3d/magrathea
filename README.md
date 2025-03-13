@@ -14,4 +14,5 @@ The result is a simple roguelite solution, so the majority of game dev can be fo
 
 Usage
 -----
+Look at the tests if you're impatient.
 

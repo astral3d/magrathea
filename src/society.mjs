@@ -1,10 +1,11 @@
-import { Random } from 'random-seed-class';
+import { Random } from '@environment-safe/random';
 import { Nomenclature } from './naming.mjs';
 import { Concept } from './concept.mjs';
 import { Context } from './context.mjs';
 export class Society{
     constructor(options={}){
         const seed = options.seed||'default';
+        console.log('society seed', seed);
         this.random = new Random({seed});
         const percent = 0.2 + this.random.ratio() * 0.2; //0.2 - 0.4
         if(options.syllables) this.naming = this.languageFrom(seed, options.syllables, percent);
@@ -37,6 +38,10 @@ export class Society{
     
     createName(){
         return this.naming.createName();
+    }
+    
+    createNPC(seed, options){
+        
     }
     
     languageFrom(name, allSyllables, ratio=0.4){

@@ -21,7 +21,7 @@
     "scripts": {
         "lint": "eslint src/*.mjs test/*.mjs",
         "test": "npm run import-test; npm run browser-test; npm run require-test",
-        "import-test": "mocha test/test.mjs",
+        "import-test": "moka test/test.mjs",
         "require-test": "mocha test/test.cjs",
         "build-commonjs": "./node_modules/@environment-safe/commonjs-builder/bin/build.mjs",
         "local-server": "open 'http://localhost:8085/demo.html' ; npx http-server -p 8085",
@@ -36,10 +36,48 @@
         "add-generated-files-to-commit": "git add docs/*.md; git add src/*.d.ts; git add dist/*.cjs",
         "prepare": "husky install"
     },
+    "moka": {
+        "firefox": {
+            "engine": "@open-automaton/playwright-mining-engine",
+            "options": {
+                "type": "firefox"
+            }
+        },
+        "chrome": {
+            "engine": "@open-automaton/playwright-mining-engine",
+            "options": {
+                "type": "chromium"
+            }
+        },
+        "safari": {
+            "engine": "@open-automaton/playwright-mining-engine",
+            "options": {
+                "type": "webkit"
+            }
+        },
+        "stub": "node_modules/@open-automaton/moka/src/stub.mjs",
+        "stubs": [
+            "express",
+            "module",
+            "os",
+            "fs",
+            "path"
+        ],
+        "shims": {
+            "chai": "node_modules/chai/chai.js",
+            "browser-or-node": "node_modules/browser-or-node/src/index.js"
+        }
+    },
     "dependencies": {
-        "prime-intersection-grid": "^0.0.2",
-        "random-seed-class": "^0.0.1",
+        "@astral3d/marker-engine": "file:../marker-engine",
+        "@environment-safe/random": "^0.0.2",
+        "@open-automaton/kryten": "^0.0.1",
+        "bitwise-logger": "^0.0.6",
         "browser-or-node": "^2.1.1",
-        "sift": "^17.0.1"
+        "extended-emitter": "^1.6.0",
+        "marker-engine": "^0.0.4",
+        "prime-intersection-grid": "^0.0.2",
+        "sift": "^17.0.1",
+        "three": "^0.174.0"
     }
 }
